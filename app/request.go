@@ -1,7 +1,6 @@
 package app
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -9,14 +8,14 @@ import (
 )
 
 type TextRequest struct {
-	Header      map[string]string            `json:header`
-	Method      string                       `json:method`
-	Cookies     map[string]string            `json:cookies`
-	Data        map[string]map[string]string `json:data`
-	Url         string                       `json:url`
+	Header      map[string]string            `json:"header"`
+	Method      string                       `json:"method"`
+	Cookies     map[string]string            `json:"cookies"`
+	Data        map[string]map[string]string `json:"data"`
+	URL         string                       `json:"url"`
 	Status      string                       `json:-`
-	Retry       int                          `json:retry`
-	Timeout     int                          `json:timeout`
+	Retry       int                          `json:"retry"`
+	Timeout     int                          `json:"timeout"`
 	UserRequset *http.Request                `json:-`
 }
 
@@ -34,16 +33,13 @@ var (
 	}
 )
 
-func createTextRequest(jsonStr string, hr *http.Request) *TextRequest {
-	tr := &TextRequest{}
-	json.Unmarshal([]byte(jsonStr), tr)
+func InitTextRequest(tr *TextRequest, hr *http.Request) {
 	tr.Method = strings.ToUpper(tr.Method)
 	tr.UserRequset = hr
-	return tr
 }
 
 func BuildHttpRequest(tr *TextRequest) (*http.Request, error) {
-	req, err := http.NewRequest(tr.Method, tr.Url, nil)
+	req, err := http.NewRequest(tr.Method, tr.URL, nil)
 	if err != nil {
 		return nil, err
 	}
