@@ -1,6 +1,8 @@
 package app
 
 import (
+	"compress/gzip"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -30,6 +32,7 @@ var (
 		"Cookie",
 		"If-Modified-Since",
 		"Etag",
+		"Accept-Encoding",
 	}
 )
 
@@ -68,12 +71,32 @@ func SendRequest(hr *http.Request) (*TextResponse, error) {
 		}
 	}()
 	log.Println(resp)
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
+	var body string
 	tr := &TextResponse{}
-	tr.Body = string(body)
+	switch resp.Header.Get("Content-Encoding") {
+	case "gzip":
+		reader, _ := gzip.NewReader(resp.Body)
+		defer reader.Close()
+		for {
+			buf := make([]byte, 1024)
+			n, err := reader.Read(buf)
+			if err != nil && err != io.EOF {
+				return nil, err
+			}
+			if n == 0 {
+				break
+			}
+			body += string(buf)
+		}
+	default:
+		bodyByte, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		body = string(bodyByte)
+	}
+
+	tr.Body = body
 	tr.HttpStatus = resp.StatusCode
 	return tr, nil
 }
