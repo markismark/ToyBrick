@@ -55,18 +55,19 @@ func resquestHandler(w http.ResponseWriter, r *http.Request) {
 	for _, ch := range chs {
 		<-ch
 	}
-	log.Println("get all response")
-	content, _ := json.Marshal(responses)
-	fmt.Fprintf(w, "%s", string(content))
+	contentByte, _ := json.Marshal(responses)
+	content := string(contentByte)
 
-	// tr, err := createTextRequest(textRequestJSON, r)
-	// hr, _ := BuildHttpRequest(tr)
-	// response, err := SendRequest(hr)
-	// if err != nil {
-	// 	fmt.Fprintln(w, err)
-	// 	return
-	// }
-	//fmt.Fprintf(w, response.Body)
+	callback := ""
+	callbackArr := r.Form["callback"]
+	if len(callbackArr) != 0 {
+		callback = callbackArr[0]
+		content = fmt.Sprintf("if (window.%s)%s(%s)", callback, callback, content)
+		w.Header().Set("Content-Type", "application/javascript")
+	}
+
+	fmt.Fprintf(w, "%s", content)
+
 }
 
 func loadConfig() {
