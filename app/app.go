@@ -56,10 +56,8 @@ func resquestHandler(w http.ResponseWriter, r *http.Request) {
 		<-ch
 	}
 	log.Println("get all response")
-	for _, response := range responses {
-		fmt.Fprintf(w, "%s-------------------------\n", response.Body)
-
-	}
+	content, _ := json.Marshal(responses)
+	fmt.Fprintf(w, "%s", string(content))
 
 	// tr, err := createTextRequest(textRequestJSON, r)
 	// hr, _ := BuildHttpRequest(tr)
