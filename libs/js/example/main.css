@@ -1,0 +1,35 @@
+body {
+    margin: 8px;
+}
+
+.proxy {
+    margin-bottom: 10px;
+}
+
+.proxy .url,
+.item .url {
+    width: 400px;
+    border-width: 0px 0px 2px 0px;
+}
+
+.item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px 4px 0 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.item .rheader {
+    margin: 5px;
+}
+
+.item .rparams {
+    padding: 3px 0px;
+    background: #F7F7F9;
+}
+
+.item .rparamitem {
+    padding: 3px;
+    margin-top: 10px;
+}

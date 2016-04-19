@@ -9,7 +9,9 @@ import (
 
 //Run function
 func Run() {
-	http.HandleFunc("/", resquestHandler)
+	http.HandleFunc("/proxy", resquestHandler)
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./libs"))))
+
 	err := http.ListenAndServe(":8123", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe:", err)
