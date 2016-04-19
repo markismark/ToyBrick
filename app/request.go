@@ -73,12 +73,12 @@ func SendRequest(hr *http.Request) (*TextResponse, error) {
 	log.Println(resp)
 	var body string
 	tr := &TextResponse{}
+	buf := make([]byte, 1024)
 	switch resp.Header.Get("Content-Encoding") {
 	case "gzip":
 		reader, _ := gzip.NewReader(resp.Body)
 		defer reader.Close()
 		for {
-			buf := make([]byte, 1024)
 			n, err := reader.Read(buf)
 			if err != nil && err != io.EOF {
 				return nil, err
@@ -86,7 +86,7 @@ func SendRequest(hr *http.Request) (*TextResponse, error) {
 			if n == 0 {
 				break
 			}
-			body += string(buf)
+			body += string(buf[:n])
 		}
 	default:
 		bodyByte, err := ioutil.ReadAll(resp.Body)
