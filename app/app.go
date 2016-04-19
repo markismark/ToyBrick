@@ -34,17 +34,33 @@ func resquestHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, err)
 		return
 	}
-	for _, tr := range trList {
+	chs := []chan int{}
+	responses := make([]*TextResponse, len(trList))
+	for i, tr := range trList {
 		log.Printf("%#v", tr)
 		InitTextRequest(&tr, r)
 		hr, _ := BuildHttpRequest(&tr)
-		response, err := SendRequest(hr)
-		if err != nil {
-			fmt.Fprintln(w, err)
-			return
-		}
-		fmt.Fprintf(w, "%s-------------------------\n", response.Body)
+		ch := make(chan int)
+		chs = append(chs, ch)
+		go func(i int) {
+			response, err := SendRequest(hr)
+			log.Printf("get response %d\n", i)
+			responses[i] = response
+			if err != nil {
+				fmt.Fprintln(w, err)
+			}
+			ch <- 0
+		}(i)
 	}
+	for _, ch := range chs {
+		<-ch
+	}
+	log.Println("get all response")
+	for _, response := range responses {
+		fmt.Fprintf(w, "%s-------------------------\n", response.Body)
+
+	}
+
 	// tr, err := createTextRequest(textRequestJSON, r)
 	// hr, _ := BuildHttpRequest(tr)
 	// response, err := SendRequest(hr)
