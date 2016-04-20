@@ -25,27 +25,34 @@
     <div class="item">
         <div class="rheader">
             Request Url:<input type="text" class="url" placeholder="http://">
-            <select id="request-method-selector">
-                    <option value="GET" selected="">GET</option>
-                    <option value="POST">POST</option>
-                    <option value="PUT">PUT</option>
-                    <option value="PATCH">PATCH</option>
-                    <option value="DELETE">DELETE</option>
-                    <option value="COPY">COPY</option>
-                    <option value="HEAD">HEAD</option>
-                    <option value="OPTIONS">OPTIONS</option>
-                    <option value="LINK">LINK</option>
-                    <option value="UNLINK">UNLINK</option>
-                    <option value="PURGE">PURGE</option>
-                </select>
+            <select class="method">
+                <option value="GET" selected="">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="PATCH">PATCH</option>
+                <option value="DELETE">DELETE</option>
+                <option value="COPY">COPY</option>
+                <option value="HEAD">HEAD</option>
+                <option value="OPTIONS">OPTIONS</option>
+                <option value="LINK">LINK</option>
+                <option value="UNLINK">UNLINK</option>
+                <option value="PURGE">PURGE</option>
+             </select>
+            <input type="button" value="Add Param">
         </div>
         <div class="rparams">
             <div class="rparamitem">
                 <input type="text" class="paramkey"> <span>:</span>
-                <input type="text" class="paramvalue"> 
+                <input type="text" class="paramvalue">
+            </div>
+            <div class="rparamitem">
+                <input type="text" class="paramkey"> <span>:</span>
+                <input type="text" class="paramvalue">
             </div>
         </div>
     </div>
+    <script type="text/javascript">
+    </script>
 </body>
 
 </html>

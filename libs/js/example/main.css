@@ -23,6 +23,9 @@ body {
 .item .rheader {
     margin: 5px;
 }
+.item .method{
+    height: 27px;
+}
 
 .item .rparams {
     padding: 3px 0px;
@@ -32,4 +35,10 @@ body {
 .item .rparamitem {
     padding: 3px;
     margin-top: 10px;
+}
+.rparamitem .paramkey{
+    width: 250px;
+}
+.rparamitem .paramvalue{
+    width: 250px;
 }
