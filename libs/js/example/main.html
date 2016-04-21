@@ -15,6 +15,7 @@
     <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
     <script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../sdk.js"></script>
+    <script type="text/javascript" src="./tempalte.js"></script>
     <link rel="stylesheet" href="./main.css">
 </head>
 
@@ -22,39 +23,46 @@
     <div class="proxy">
         <span>Proxy Url:</span> <input id="proxyurl" type="text" class="url" placeholder="http://" value="http://127.0.0.1:8123/proxy">
     </div>
-    <div class="item">
-        <div class="rheader">
-            Request Url:<input type="text" class="url" placeholder="http://" value="">
-            <select class="method">
-                <option value="GET" selected="">GET</option>
-                <option value="POST">POST</option>
-             </select>
-            <input type="button" value="Add Param">
-        </div>
-        <div class="rparams hide">
-            <div class="rparamitem">
-                <input type="text" class="paramkey"> <span>:</span>
-                <input type="text" class="paramvalue">
-            </div>
-            <div class="rparamitem">
-                <input type="text" class="paramkey"> <span>:</span>
-                <input type="text" class="paramvalue">
-            </div>
-        </div>
-        <div class="response">
-            Response:
-            <div class="content"></div>
-        </div>
-    </div>
+    <button id="addItem">Add Request Item</button>
+    <div id="itemswrapper"></div>
     <div class=""><button id="send">Send</button></div>
+    <script id="tpl" type="text/html">
+        <div class="item">
+            <div class="rheader">
+                Request Url:<input type="text" class="url" placeholder="http://" value="">
+                <select class="method">
+                    <option value="GET" selected="">GET</option>
+                    <option value="POST">POST</option>
+                </select>
+                <input type="button" class="addparam" value="Add Param">
+            </div>
+            <div class="rparams hide">
+                <div class="rparamitem">
+                    <input type="text" class="paramkey"> <span>:</span>
+                    <input type="text" class="paramvalue">
+                </div>
 
+            </div>
+            <div class="response">
+                Response:
+                <div class="content"></div>
+            </div>
+        </div>
+    </script>
+    <script id="paramstpl" type="text/html">
+        <div class="rparamitem">
+            <input type="text" class="paramkey"> <span>:</span>
+            <input type="text" class="paramvalue">
+        </div>
+    </script>
     <script type="text/javascript">
         $(function() {
+            addItem();
             bindEvents();
         })
 
         function bindEvents() {
-            $(".item").delegate(".method", "click", function() {
+            $("#itemswrapper").delegate(".item .method", "click", function() {
                 var p = $(this).parents(".item");
                 if ($(this).val() == "POST") {
                     $(".rparams", p).removeClass("hide");
@@ -63,6 +71,14 @@
                 }
             });
             $("#send").click(send);
+            $("#addItem").click(addItem);
+            $("#itemswrapper").delegate(".addparam", "click", function() {
+                console.log("sss");
+                var p = $(this).parents(".item");
+                var tpl = document.getElementById('paramstpl').innerHTML;
+                var html = template(tpl);
+                $(".rparams",p).append(html);
+            })
         }
 
         function getParams() {
@@ -100,12 +116,21 @@
                 },
                 "method": "get",
                 "success": function(e) {
-                    console.log(e);
+                    for(var i in e){
+                        var content = "status :"+e[i].status+";content:"+e[i].body;
+                        $("#itemswrapper .item:eq("+i+") .content").text(content);    
+                }
                 },
                 "error": function(e) {
                     console.log(e);
                 }
             });
+        }
+
+        function addItem() {
+            var tpl = document.getElementById('tpl').innerHTML;
+            var html = template(tpl);
+            $("#itemswrapper").append(html);
         }
     </script>
 </body>
