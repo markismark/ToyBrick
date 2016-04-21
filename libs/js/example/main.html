@@ -47,63 +47,64 @@
         </div>
     </div>
     <div class=""><button id="send">Send</button></div>
-    
+
     <script type="text/javascript">
-        $(function(){
+        $(function() {
             bindEvents();
         })
-        function bindEvents(){
-            $(".item").delegate(".method", "click", function(){
+
+        function bindEvents() {
+            $(".item").delegate(".method", "click", function() {
                 var p = $(this).parents(".item");
-                if($(this).val() == "POST"){
-                   $(".rparams", p).removeClass("hide");
-                }else{
-                   $(".rparams", p).addClass("hide");
+                if ($(this).val() == "POST") {
+                    $(".rparams", p).removeClass("hide");
+                } else {
+                    $(".rparams", p).addClass("hide");
                 }
             });
             $("#send").click(send);
         }
-    
-        function getParams(){
+
+        function getParams() {
             var requests = [];
-            $(".item").each(function(i,e){
+            $(".item").each(function(i, e) {
                 var item = {};
                 var that = $(this);
                 item.url = $(".url", that).val();
                 item.method = $(".method", that).val();
                 var params = [];
-                $(".rparamitem",that).each(function(ip,ie){
+                $(".rparamitem", that).each(function(ip, ie) {
                     var key = $(".paramkey", $(this)).val();
                     var value = $(".paramvalue", $(this)).val().trim();
-                    if (key!= ""){
-                        params.push(encodeURI(key)+"="+value);
+                    if (key != "") {
+                        params.push(encodeURI(key) + "=" + value);
                     }
-                    
-                    
                 });
-                if(item.method == "POST"){
+                if (item.method == "POST") {
                     item.data = params.join("&");
                 }
-                
+
                 console.log(item);
                 requests.push(item);
             });
             return requests;
         }
-        
-        function send(){
+
+        function send() {
             var data = getParams();
             var url = $("#proxyurl").val();
             $.ajax({
-               "url" : url,
-               "data" : {data:JSON.stringify(data)},
-               "method" :"get",
-               "success":function(e){
-                   console.log(e);
-               } ,
-               "error":function(e){
-                   console.log(e);
-               }
+                "url": url,
+                "data": {
+                    data: JSON.stringify(data)
+                },
+                "method": "get",
+                "success": function(e) {
+                    console.log(e);
+                },
+                "error": function(e) {
+                    console.log(e);
+                }
             });
         }
     </script>

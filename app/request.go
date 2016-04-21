@@ -55,6 +55,7 @@ func BuildHttpRequest(tr *TextRequest) (*http.Request, error) {
 		}
 	}
 	if req.Method == "POST" {
+		//If not set content-type, some servers can't parse the data.
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
 	//tr.UserRequset.Header.Set("Connection", "keep-alive")
