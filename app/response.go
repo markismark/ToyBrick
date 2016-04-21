@@ -5,9 +5,9 @@ import (
 )
 
 type TextResponse struct {
-	Body       string            `json:"body"`
-	HttpStatus int               `json:"status"`
-	SetCookie  map[string]string `json:"cookie"`
+	Body       string `json:"body"`
+	HttpStatus int    `json:"status"`
+	//SetCookie  map[string]string `json:"cookie"`
 }
 
 func BuildTextResponse(response http.Response) {
