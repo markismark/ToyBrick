@@ -66,6 +66,8 @@ func resquestHandler(w http.ResponseWriter, r *http.Request) {
 		callback = callbackArr[0]
 		content = fmt.Sprintf("if (window.%s)%s(%s)", callback, callback, content)
 		w.Header().Set("Content-Type", "application/javascript")
+	} else {
+		w.Header().Set("Content-Type", "application/json")
 	}
 
 	fmt.Fprintf(w, "%s", content)

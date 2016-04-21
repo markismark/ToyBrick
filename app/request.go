@@ -10,15 +10,15 @@ import (
 )
 
 type TextRequest struct {
-	Header      map[string]string            `json:"header"`
-	Method      string                       `json:"method"`
-	Cookies     map[string]string            `json:"cookies"`
-	Data        map[string]map[string]string `json:"data"`
-	URL         string                       `json:"url"`
-	Status      string                       `json:-`
-	Retry       int                          `json:"retry"`
-	Timeout     int                          `json:"timeout"`
-	UserRequset *http.Request                `json:-`
+	Header      map[string]string `json:"header"`
+	Method      string            `json:"method"`
+	Cookies     map[string]string `json:"cookies"`
+	Data        string            `json:"data"`
+	URL         string            `json:"url"`
+	Status      string            `json:-`
+	Retry       int               `json:"retry"`
+	Timeout     int               `json:"timeout"`
+	UserRequset *http.Request     `json:-`
 }
 
 var (
@@ -33,6 +33,7 @@ var (
 		"If-Modified-Since",
 		"Etag",
 		"Accept-Encoding",
+		//"Connection",
 	}
 )
 
@@ -42,7 +43,8 @@ func InitTextRequest(tr *TextRequest, hr *http.Request) {
 }
 
 func BuildHttpRequest(tr *TextRequest) (*http.Request, error) {
-	req, err := http.NewRequest(tr.Method, tr.URL, nil)
+	req, err := http.NewRequest(tr.Method, tr.URL, strings.NewReader(tr.Data))
+
 	if err != nil {
 		return nil, err
 	}
@@ -52,6 +54,10 @@ func BuildHttpRequest(tr *TextRequest) (*http.Request, error) {
 			req.Header.Set(key, value)
 		}
 	}
+	if req.Method == "POST" {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
+	//tr.UserRequset.Header.Set("Connection", "keep-alive")
 	return req, nil
 }
 

@@ -20,27 +20,18 @@
 
 <body>
     <div class="proxy">
-        <span>Proxy Url:</span> <input type="text" class="url" placeholder="http://">
+        <span>Proxy Url:</span> <input id="proxyurl" type="text" class="url" placeholder="http://" value="http://127.0.0.1:8123/proxy">
     </div>
     <div class="item">
         <div class="rheader">
-            Request Url:<input type="text" class="url" placeholder="http://">
+            Request Url:<input type="text" class="url" placeholder="http://" value="">
             <select class="method">
                 <option value="GET" selected="">GET</option>
                 <option value="POST">POST</option>
-                <option value="PUT">PUT</option>
-                <option value="PATCH">PATCH</option>
-                <option value="DELETE">DELETE</option>
-                <option value="COPY">COPY</option>
-                <option value="HEAD">HEAD</option>
-                <option value="OPTIONS">OPTIONS</option>
-                <option value="LINK">LINK</option>
-                <option value="UNLINK">UNLINK</option>
-                <option value="PURGE">PURGE</option>
              </select>
             <input type="button" value="Add Param">
         </div>
-        <div class="rparams">
+        <div class="rparams hide">
             <div class="rparamitem">
                 <input type="text" class="paramkey"> <span>:</span>
                 <input type="text" class="paramvalue">
@@ -50,8 +41,71 @@
                 <input type="text" class="paramvalue">
             </div>
         </div>
+        <div class="response">
+            Response:
+            <div class="content"></div>
+        </div>
     </div>
+    <div class=""><button id="send">Send</button></div>
+    
     <script type="text/javascript">
+        $(function(){
+            bindEvents();
+        })
+        function bindEvents(){
+            $(".item").delegate(".method", "click", function(){
+                var p = $(this).parents(".item");
+                if($(this).val() == "POST"){
+                   $(".rparams", p).removeClass("hide");
+                }else{
+                   $(".rparams", p).addClass("hide");
+                }
+            });
+            $("#send").click(send);
+        }
+    
+        function getParams(){
+            var requests = [];
+            $(".item").each(function(i,e){
+                var item = {};
+                var that = $(this);
+                item.url = $(".url", that).val();
+                item.method = $(".method", that).val();
+                var params = [];
+                $(".rparamitem",that).each(function(ip,ie){
+                    var key = $(".paramkey", $(this)).val();
+                    var value = $(".paramvalue", $(this)).val().trim();
+                    if (key!= ""){
+                        params.push(encodeURI(key)+"="+value);
+                    }
+                    
+                    
+                });
+                if(item.method == "POST"){
+                    item.data = params.join("&");
+                }
+                
+                console.log(item);
+                requests.push(item);
+            });
+            return requests;
+        }
+        
+        function send(){
+            var data = getParams();
+            var url = $("#proxyurl").val();
+            $.ajax({
+               "url" : url,
+               "data" : {data:JSON.stringify(data)},
+               "method" :"get",
+               "success":function(e){
+                   console.log(e);
+               } ,
+               "error":function(e){
+                   console.log(e);
+               }
+            });
+        }
     </script>
 </body>
 
