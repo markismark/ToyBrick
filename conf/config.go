@@ -2,6 +2,7 @@ package conf
 
 import (
 	"log"
+	"strings"
 
 	"github.com/Maxgis/ToyBrick/util"
 	"github.com/go-ini/ini"
@@ -19,9 +20,30 @@ func init() {
 }
 
 func GetPort() (string, error) {
-	port, err := cfg.Section("basic").GetKey("port")
+	portKey, err := cfg.Section("basic").GetKey("port")
 	if err != nil {
 		log.Fatal(err)
 	}
-	return port.String(), nil
+	return portKey.String(), nil
+}
+
+func IsOpenReferrer() bool {
+	isOpenKey, err := cfg.Section("security").GetKey("openReferrer")
+	if err != nil {
+		return false
+	}
+	isOpen, perr := isOpenKey.Bool()
+	if perr != nil {
+		return false
+	}
+	return isOpen
+}
+
+func GetReferrerWhiteList() []string {
+	referrerWhiteList, err := cfg.Section("security").GetKey("referrerWhiteList")
+	if err != nil {
+		return []string{}
+	}
+
+	return strings.Split(referrerWhiteList.String(), ",")
 }

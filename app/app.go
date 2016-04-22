@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/Maxgis/ToyBrick/conf"
+	"github.com/Maxgis/ToyBrick/util"
 )
 
 //Run function
@@ -26,9 +27,17 @@ func Run() {
 }
 
 func resquestHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/favicon.ico" {
-		return
+
+	if conf.IsOpenReferrer() {
+		referer := r.Header.Get("referer")
+		refererHost := util.GetUrlDomain(referer)
+		refererList := conf.GetReferrerWhiteList()
+		if !util.HostIsInList(refererHost, refererList) {
+			fmt.Fprintln(w, "over")
+			return
+		}
 	}
+
 	r.ParseForm()
 	data := r.Form["data"]
 	if len(data) == 0 {
