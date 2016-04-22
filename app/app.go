@@ -5,16 +5,21 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/Maxgis/ToyBrick/conf"
 )
 
 //Run function
 func Run() {
 	http.HandleFunc("/proxy", resquestHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./libs"))))
-
-	err := http.ListenAndServe(":8123", nil)
+	port, err := conf.GetPort()
 	if err != nil {
-		log.Fatal("ListenAndServe:", err)
+		log.Fatal(err)
+	}
+	herr := http.ListenAndServe(":"+port, nil)
+	if herr != nil {
+		log.Fatal("ListenAndServe:", herr)
 	}
 	fmt.Println("begin run")
 
@@ -71,13 +76,5 @@ func resquestHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintf(w, "%s", content)
-
-}
-
-func loadConfig() {
-
-}
-
-func parseParams() {
 
 }
