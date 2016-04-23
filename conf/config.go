@@ -14,6 +14,8 @@ type Config struct {
 	ReferrerWhiteList     []string
 	IsOpenDomainWhitelist bool
 	DomainWhitelist       []string
+	IsOpenAdmin           bool
+	AdminPort             string
 }
 
 var (
@@ -37,6 +39,8 @@ func init() {
 	Globals.ReferrerWhiteList = GetReferrerWhiteList()
 	Globals.DomainWhitelist = GetOpenDomainWhitelist()
 	Globals.IsOpenDomainWhitelist = IsOpenDomainWhitelist()
+	Globals.AdminPort = GetAdminPort()
+	Globals.IsOpenAdmin = IsOpenAdmin()
 }
 
 func GetPort() (string, error) {
@@ -45,6 +49,26 @@ func GetPort() (string, error) {
 		log.Fatal(err)
 	}
 	return portKey.String(), nil
+}
+
+func GetAdminPort() string {
+	portKey, err := cfg.Section("admin").GetKey("port")
+	if err != nil {
+		return ""
+	}
+	return portKey.String()
+}
+
+func IsOpenAdmin() bool {
+	isOpenKey, err := cfg.Section("admin").GetKey("open")
+	if err != nil {
+		return false
+	}
+	isOpen, perr := isOpenKey.Bool()
+	if perr != nil {
+		return false
+	}
+	return isOpen
 }
 
 func IsOpenReferrer() bool {
