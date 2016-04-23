@@ -26,9 +26,16 @@ func GetUrlDomain(urlStr string) string {
 
 func HostIsInList(host string, list []string) bool {
 	for _, h := range list {
-		if h == host {
+		if HostIsMatch(host, h) {
 			return true
 		}
 	}
 	return false
+}
+
+func HostIsMatch(host string, pattern string) bool {
+	if strings.HasPrefix(pattern,"*") {
+		return strings.HasSuffix(host, pattern[1:])
+	}
+	return host == pattern
 }
