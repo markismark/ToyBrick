@@ -14,13 +14,9 @@ import (
 func Run() {
 	http.HandleFunc("/proxy", resquestHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./libs"))))
-	port, err := conf.GetPort()
+	err := http.ListenAndServe(":"+conf.Globals.Port, nil)
 	if err != nil {
-		log.Fatal(err)
-	}
-	herr := http.ListenAndServe(":"+port, nil)
-	if herr != nil {
-		log.Fatal("ListenAndServe:", herr)
+		log.Fatal("ListenAndServe:", err)
 	}
 	fmt.Println("begin run")
 
@@ -28,10 +24,10 @@ func Run() {
 
 func resquestHandler(w http.ResponseWriter, r *http.Request) {
 
-	if conf.IsOpenReferrer() {
+	if conf.Globals.IsOpenReferrer {
 		referer := r.Header.Get("referer")
 		refererHost := util.GetUrlDomain(referer)
-		refererList := conf.GetReferrerWhiteList()
+		refererList := conf.Globals.ReferrerWhiteList
 		if !util.HostIsInList(refererHost, refererList) {
 			fmt.Fprintln(w, "over")
 			return
@@ -70,6 +66,7 @@ func resquestHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	for _, ch := range chs {
 		<-ch
+		close(ch)
 	}
 	contentByte, _ := json.Marshal(responses)
 	content := string(contentByte)

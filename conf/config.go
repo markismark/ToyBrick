@@ -8,7 +8,16 @@ import (
 	"github.com/go-ini/ini"
 )
 
-var cfg *ini.File
+type Config struct {
+	Port              string
+	IsOpenReferrer    bool
+	ReferrerWhiteList []string
+}
+
+var (
+	cfg     *ini.File
+	Globals = &Config{}
+)
 
 func init() {
 	file := util.GetCurrentDirectory() + "/conf/conf.ini"
@@ -17,6 +26,13 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	port, err := GetPort()
+	if err != nil {
+		log.Fatal(err)
+	}
+	Globals.Port = port
+	Globals.IsOpenReferrer = IsOpenReferrer()
+	Globals.ReferrerWhiteList = GetReferrerWhiteList()
 }
 
 func GetPort() (string, error) {
