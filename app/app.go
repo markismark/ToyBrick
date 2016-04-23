@@ -27,8 +27,7 @@ func resquestHandler(w http.ResponseWriter, r *http.Request) {
 	if conf.Globals.IsOpenReferrer {
 		referer := r.Header.Get("referer")
 		refererHost := util.GetUrlDomain(referer)
-		refererList := conf.Globals.ReferrerWhiteList
-		if !util.HostIsInList(refererHost, refererList) {
+		if !util.HostIsInList(refererHost, conf.Globals.ReferrerWhiteList) {
 			fmt.Fprintln(w, "over")
 			return
 		}
@@ -50,6 +49,13 @@ func resquestHandler(w http.ResponseWriter, r *http.Request) {
 	responses := make([]*TextResponse, len(trList))
 	for i, tr := range trList {
 		log.Printf("%#v", tr)
+		if conf.Globals.IsOpenDomainWhitelist {
+			requertHost := util.GetUrlDomain(tr.URL)
+			if !util.HostIsInList(requertHost, conf.Globals.DomainWhitelist) {
+				responses[i] = &TextResponse{HttpStatus: ERROR_NOT_IN_WHITELIST}
+				continue
+			}
+		}
 		InitTextRequest(&tr, r)
 		hr, _ := BuildHttpRequest(&tr)
 		ch := make(chan int)

@@ -7,7 +7,8 @@ RequestProxy open multi goruntime to send the requests and avoid one by one
 * Forwarding request
 * Monitor
 * WebSocket
-* White and Black List
+* Refererr White List
+* Request White List
 * Request Pool
 * PHP AND JS SDK
 

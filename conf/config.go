@@ -9,9 +9,11 @@ import (
 )
 
 type Config struct {
-	Port              string
-	IsOpenReferrer    bool
-	ReferrerWhiteList []string
+	Port                  string
+	IsOpenReferrer        bool
+	ReferrerWhiteList     []string
+	IsOpenDomainWhitelist bool
+	DomainWhitelist       []string
 }
 
 var (
@@ -33,6 +35,8 @@ func init() {
 	Globals.Port = port
 	Globals.IsOpenReferrer = IsOpenReferrer()
 	Globals.ReferrerWhiteList = GetReferrerWhiteList()
+	Globals.DomainWhitelist = GetOpenDomainWhitelist()
+	Globals.IsOpenDomainWhitelist = IsOpenDomainWhitelist()
 }
 
 func GetPort() (string, error) {
@@ -62,4 +66,25 @@ func GetReferrerWhiteList() []string {
 	}
 
 	return strings.Split(referrerWhiteList.String(), ",")
+}
+
+func IsOpenDomainWhitelist() bool {
+	isOpenKey, err := cfg.Section("security").GetKey("openDomain")
+	if err != nil {
+		return false
+	}
+	isOpen, perr := isOpenKey.Bool()
+	if perr != nil {
+		return false
+	}
+	return isOpen
+}
+
+func GetOpenDomainWhitelist() []string {
+	domainWhiteList, err := cfg.Section("security").GetKey("domainWhiteList")
+	if err != nil {
+		return []string{}
+	}
+
+	return strings.Split(domainWhiteList.String(), ",")
 }
