@@ -64,6 +64,7 @@ func resquestHandler(w http.ResponseWriter, r *http.Request) {
 			response, err := SendRequest(hr)
 			log.Printf("get response %d\n", i)
 			responses[i] = response
+			AddStat(hr.URL)
 			if err != nil {
 				fmt.Fprintln(w, err)
 			}
