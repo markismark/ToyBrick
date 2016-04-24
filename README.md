@@ -18,7 +18,11 @@ RequestProxy open multi goruntime to send the requests and avoid one by one
 ##HOW TO USE
 1. Build and Run. You can use the command 
 
-    `go build -o toybrick main.go ; ./toybrick` or `./run.sh`
+    > `go build -o toybrick main.go ; ./toybrick`
+    
+    or
+     
+    > `./run.sh`
     
 2. The proxy url : http://localhost:8123/proxy
 
