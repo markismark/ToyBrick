@@ -54,6 +54,8 @@ func (this *HostMap) AddStatistic(URL *url.URL) {
 	if !ok {
 		urlmap = this.addHost(host)
 	}
+	urlmap.lock.Lock()
+	defer urlmap.lock.Unlock()
 	urlmap.RequsetNum++
 
 	pathStat, pok := urlmap.pathmap[path]
