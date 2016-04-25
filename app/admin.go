@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/Maxgis/ToyBrick/conf"
 )
@@ -12,11 +13,11 @@ var mux map[string]func(http.ResponseWriter, *http.Request)
 
 func init() {
 	if conf.Globals.IsOpenAdmin {
-		if conf.Globals.AdminPort == "" {
+		if conf.Globals.AdminPort == 0 {
 			return
 		}
 		server := http.Server{
-			Addr:    ":" + conf.Globals.AdminPort,
+			Addr:    ":" + strconv.Itoa(conf.Globals.AdminPort),
 			Handler: &AdminHandle{},
 		}
 		mux = make(map[string]func(http.ResponseWriter, *http.Request))

@@ -9,13 +9,13 @@ import (
 )
 
 type Config struct {
-	Port                  string
+	Port                  int
 	IsOpenReferrer        bool
 	ReferrerWhiteList     []string
 	IsOpenDomainWhitelist bool
 	DomainWhitelist       []string
 	IsOpenAdmin           bool
-	AdminPort             string
+	AdminPort             int
 }
 
 var (
@@ -30,11 +30,8 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	port, err := GetPort()
-	if err != nil {
-		log.Fatal(err)
-	}
-	Globals.Port = port
+
+	Globals.Port = GetPort()
 	Globals.IsOpenReferrer = IsOpenReferrer()
 	Globals.ReferrerWhiteList = GetReferrerWhiteList()
 	Globals.DomainWhitelist = GetOpenDomainWhitelist()
@@ -43,20 +40,28 @@ func init() {
 	Globals.IsOpenAdmin = IsOpenAdmin()
 }
 
-func GetPort() (string, error) {
+func GetPort() int {
 	portKey, err := cfg.Section("basic").GetKey("port")
 	if err != nil {
 		log.Fatal(err)
 	}
-	return portKey.String(), nil
+	port, err2 := portKey.Int()
+	if err2 != nil {
+		log.Fatal(err2)
+	}
+	return port
 }
 
-func GetAdminPort() string {
+func GetAdminPort() int {
 	portKey, err := cfg.Section("admin").GetKey("port")
 	if err != nil {
-		return ""
+		return 0
 	}
-	return portKey.String()
+	port, err2 := portKey.Int()
+	if err2 != nil {
+		return 0
+	}
+	return port
 }
 
 func IsOpenAdmin() bool {

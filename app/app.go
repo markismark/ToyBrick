@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/Maxgis/ToyBrick/conf"
 	"github.com/Maxgis/ToyBrick/util"
@@ -15,7 +16,7 @@ func Run() {
 	http.HandleFunc("/proxy", resquestHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./libs"))))
 	log.Println("start proxy ,port:", conf.Globals.Port)
-	err := http.ListenAndServe(":"+conf.Globals.Port, nil)
+	err := http.ListenAndServe(":"+strconv.Itoa(conf.Globals.Port), nil)
 	if err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
