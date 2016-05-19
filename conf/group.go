@@ -7,8 +7,23 @@ import (
 	"github.com/go-ini/ini"
 )
 
+type Group struct {
+	Name     string
+	Timeout  int
+	Protocol string
+	Balance  string
+	MaxRetry int
+	Host     string
+	Machines *[]Machine
+}
+
+type Machine struct {
+	Host string
+	Port int
+}
+
 func init() {
-	file := util.GetCurrentDirectory() + "/conf/machine.ini"
+	file := util.GetCurrentDirectory() + "/conf/group.ini"
 	var err error
 	cfg, err = ini.LooseLoad("filename", file)
 	if err != nil {

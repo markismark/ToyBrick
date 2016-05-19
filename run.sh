@@ -1,2 +1,2 @@
 #!/bin/sh
-go build -o toybrick main.go ; ./toybrick
+go build -o toybrick.exe main.go ; ./toybrick.exe
