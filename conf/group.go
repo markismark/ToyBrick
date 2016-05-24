@@ -3,6 +3,8 @@ package conf
 import (
 	"log"
 	"mi_com_tool_dataset/util"
+	"strconv"
+	"strings"
 
 	"github.com/go-ini/ini"
 )
@@ -20,7 +22,7 @@ type Group struct {
 	Balance  string
 	MaxRetry uint
 	Host     string
-	Machines *[]Machine
+	Machines *[]*Machine
 }
 
 type Machine struct {
@@ -38,7 +40,13 @@ func init() {
 	sections := cfg.Sections()
 	for _, section := range sections {
 		Tags[section.Name()] = initGroup(section)
-		log.Printf("%#v\n", Tags[section.Name()])
+		//log.Printf("%#v\n", Tags[section.Name()])
+		if Tags[section.Name()].Machines == nil {
+			continue
+		}
+		for _, machine := range *Tags[section.Name()].Machines {
+			log.Printf("%#v\n", machine)
+		}
 	}
 
 	//log.Printf("%#v\n", Tags)
@@ -49,11 +57,13 @@ func initGroup(section *ini.Section) *Group {
 	protocol := getProtocol(section)
 	maxRetry := getMaxRetry(section)
 	host := getHost(section)
+	machines := getMachines(section)
 	return &Group{
 		Timeout:  timeout,
 		Protocol: protocol,
 		MaxRetry: maxRetry,
 		Host:     host,
+		Machines: machines,
 	}
 
 }
@@ -101,4 +111,29 @@ func getHost(section *ini.Section) string {
 		return ""
 	}
 	return hostKey.MustString("")
+}
+
+func getMachines(section *ini.Section) *[]*Machine {
+	var err error
+	var machinesKey *ini.Key
+	machinesKey, err = section.GetKey("machines")
+	if err != nil {
+		return nil
+	}
+	machinesStr := machinesKey.MustString("")
+	machinesArr := strings.Split(machinesStr, ",")
+	length := len(machinesArr)
+	if length == 0 {
+		return nil
+	}
+	machines := make([]*Machine, length)
+	for i, machineStr := range machinesArr {
+		machineInfo := strings.Split(machineStr, ":")
+		var port int
+		if length > 1 {
+			port, err = strconv.Atoi(machineInfo[1])
+		}
+		machines[i] = &Machine{Host: machineInfo[0], Port: port}
+	}
+	return &machines
 }
