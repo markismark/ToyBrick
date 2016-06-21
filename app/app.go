@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 	"strconv"
 
 	"github.com/Maxgis/ToyBrick/conf"
@@ -26,13 +27,9 @@ func Run() {
 
 func resquestHandler(w http.ResponseWriter, r *http.Request) {
 
-	if conf.Globals.IsOpenReferrer {
-		referer := r.Header.Get("referer")
-		refererHost := util.GetUrlDomain(referer)
-		if !util.HostIsInList(refererHost, conf.Globals.ReferrerWhiteList) {
-			fmt.Fprintln(w, "over")
-			return
-		}
+	if !checkReferer(r) {
+		fmt.Fprintln(w, "over")
+		return
 	}
 
 	r.ParseForm()
@@ -40,6 +37,7 @@ func resquestHandler(w http.ResponseWriter, r *http.Request) {
 	if len(data) == 0 {
 		return
 	}
+
 	var trList []TextRequest
 	textRequestJSON := data[0]
 	err := json.Unmarshal([]byte(textRequestJSON), &trList)
@@ -50,13 +48,9 @@ func resquestHandler(w http.ResponseWriter, r *http.Request) {
 	chs := []chan int{}
 	responses := make([]*TextResponse, len(trList))
 	for i, tr := range trList {
-		log.Printf("%#v", tr)
-		if conf.Globals.IsOpenDomainWhitelist {
-			requertHost := util.GetUrlDomain(tr.URL)
-			if !util.HostIsInList(requertHost, conf.Globals.DomainWhitelist) {
-				responses[i] = &TextResponse{HttpStatus: ERROR_NOT_IN_WHITELIST}
-				continue
-			}
+		if !checkDomain(tr.URL) {
+			responses[i] = &TextResponse{HttpStatus: ERROR_NOT_IN_WHITELIST}
+			continue
 		}
 		InitTextRequest(&tr, r)
 		hr, _ := BuildHttpRequest(&tr)
@@ -84,6 +78,11 @@ func resquestHandler(w http.ResponseWriter, r *http.Request) {
 	callbackArr := r.Form["callback"]
 	if len(callbackArr) != 0 {
 		callback = callbackArr[0]
+		reg := regexp.MustCompile(`^[0-9a-zA-Z_]*$`)
+		if !reg.MatchString(callback) {
+			fmt.Fprintln(w, "callback params error")
+			return
+		}
 		content = fmt.Sprintf("if (window.%s)%s(%s)", callback, callback, content)
 		w.Header().Set("Content-Type", "application/javascript")
 	} else {
@@ -92,4 +91,25 @@ func resquestHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, "%s", content)
 
+}
+
+func checkReferer(r *http.Request) bool {
+	if conf.Globals.IsOpenReferrer {
+		referer := r.Header.Get("referer")
+		refererHost := util.GetUrlDomain(referer)
+		if !util.HostIsInList(refererHost, conf.Globals.ReferrerWhiteList) {
+			return false
+		}
+	}
+	return true
+}
+
+func checkDomain(url string) bool {
+	if conf.Globals.IsOpenDomainWhitelist {
+		requertHost := util.GetUrlDomain(url)
+		if !util.HostIsInList(requertHost, conf.Globals.DomainWhitelist) {
+			return false
+		}
+	}
+	return true
 }

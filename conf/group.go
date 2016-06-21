@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Maxgis/tree"
 	"github.com/go-ini/ini"
 )
 
@@ -49,7 +50,7 @@ func init() {
 		}
 	}
 
-	//log.Printf("%#v\n", Tags)
+	tree.Print(Tags)
 }
 
 func initGroup(section *ini.Section) *Group {
