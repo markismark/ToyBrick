@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/Maxgis/ToyBrick/conf"
 )
 
 type TextRequest struct {
@@ -19,6 +21,7 @@ type TextRequest struct {
 	Retry       int               `json:"retry"`
 	Timeout     int               `json:"timeout"`
 	UserRequset *http.Request     `json:-`
+	Tag         string            `json:tag`
 }
 
 var (
@@ -43,6 +46,11 @@ func InitTextRequest(tr *TextRequest, hr *http.Request) {
 }
 
 func BuildHttpRequest(tr *TextRequest) (*http.Request, error) {
+
+	if tr.Tag != "" {
+		tr.URL = conf.BuildURI(tr.Tag, tr.URL)
+	}
+
 	req, err := http.NewRequest(tr.Method, tr.URL, strings.NewReader(tr.Data))
 
 	if err != nil {

@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"fmt"
 	"log"
 	"mi_com_tool_dataset/util"
 	"strconv"
@@ -131,10 +132,17 @@ func getMachines(section *ini.Section) *[]*Machine {
 	for i, machineStr := range machinesArr {
 		machineInfo := strings.Split(machineStr, ":")
 		var port int
-		if length > 1 {
+		if len(machineInfo) > 1 {
 			port, err = strconv.Atoi(machineInfo[1])
 		}
 		machines[i] = &Machine{Host: machineInfo[0], Port: port}
+
 	}
 	return &machines
+}
+
+func BuildURI(tagName string, path string) string {
+	tag := Tags[tagName]
+	machine := (*(tag.Machines))[0]
+	return fmt.Sprintf("%s://%s:%d%s", tag.Protocol, machine.Host, machine.Port, path)
 }
