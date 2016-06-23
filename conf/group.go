@@ -3,6 +3,7 @@ package conf
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"mi_com_tool_dataset/util"
 	"strconv"
 	"strings"
@@ -28,8 +29,10 @@ type Group struct {
 }
 
 type Machine struct {
-	Host string
-	Port int
+	Host     string
+	Port     int
+	Enable   bool
+	FailTime int
 }
 
 func init() {
@@ -135,14 +138,29 @@ func getMachines(section *ini.Section) *[]*Machine {
 		if len(machineInfo) > 1 {
 			port, err = strconv.Atoi(machineInfo[1])
 		}
-		machines[i] = &Machine{Host: machineInfo[0], Port: port}
+		machines[i] = &Machine{Host: machineInfo[0], Port: port, Enable: true}
 
 	}
 	return &machines
 }
 
 func BuildURI(tagName string, path string) string {
-	tag := Tags[tagName]
-	machine := (*(tag.Machines))[0]
-	return fmt.Sprintf("%s://%s:%d%s", tag.Protocol, machine.Host, machine.Port, path)
+	group := Tags[tagName]
+	machine := getMachine(group.Balance, group.Machines)
+	return fmt.Sprintf("%s://%s:%d%s", group.Protocol, machine.Host, machine.Port, path)
+}
+
+func getMachine(balance string, machines *[]*Machine) *Machine {
+	switch balance {
+	case "random":
+		return getRandomMachine(machines)
+	default:
+		return getRandomMachine(machines)
+	}
+}
+
+func getRandomMachine(machines *[]*Machine) *Machine {
+	length := len((*machines))
+	index := rand.Intn(length)
+	return (*machines)[index]
 }
